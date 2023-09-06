@@ -5,6 +5,7 @@ __pycache__/
 
 
 pytorch/data/MNIST_DATASET/
+pytorch/data/knn.pickle
 
 # C extensions
 *.so

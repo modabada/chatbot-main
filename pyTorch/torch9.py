@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn import svm, metrics, datasets, model_selection
+import pickle
+from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -50,4 +50,7 @@ def use_input():
         x_test = s.fit_transform(x_test)
         y_pred = knn.predict(x_test)
         print(y_pred)
-use_input()
+# use_input()
+
+with open('./data/knn.pickle', 'wb') as f:
+    pickle.dump(knn, f)
