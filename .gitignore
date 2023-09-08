@@ -4,9 +4,10 @@ __pycache__/
 *$py.class
 
 
+pytorch/data/CNN_test/
 pytorch/data/MNIST_DATASET/
+pytorch/data/openCV/
 pytorch/data/knn.pickle
-
 # C extensions
 *.so
 
