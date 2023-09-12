@@ -4,10 +4,13 @@ __pycache__/
 *$py.class
 
 
-pytorch/data/cat_dog/*.pth
-pytorch/data/CNN_test/
-pytorch/data/MNIST_DATASET/
-pytorch/data/knn.pickle
+.vscode/
+
+pytorch/data/**
+!pytorch/data/**/*.png
+!pytorch/data/**/*.jpg
+!pytorch/data/**/*.csv
+!pytorch/data/**/*.data
 
 
 # C extensions

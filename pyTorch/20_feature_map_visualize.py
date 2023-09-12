@@ -1,28 +1,8 @@
-import copy
 import cv2
-import glob
-import numpy as np
 import matplotlib.pyplot as plt
-import os
-import pandas as pd
-import seaborn as sns
-from sklearn import metrics
-from sklearn.cluster import DBSCAN
-from sklearn.datasets import load_digits
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import normalize
-from sklearn.decomposition import PCA
-import shutil
-import time
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-import torchvision
-import torchvision.models as models
 from torchvision.transforms import ToTensor
 # 'a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z'
 
