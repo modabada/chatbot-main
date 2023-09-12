@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 
-pytorch/data/cat_dog/
+pytorch/data/cat_dog/*.pth
 pytorch/data/CNN_test/
 pytorch/data/MNIST_DATASET/
 pytorch/data/knn.pickle
