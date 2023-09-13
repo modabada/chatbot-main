@@ -1,4 +1,6 @@
-# 차례
+<details>
+  <summary style='cursor:pointer;font-size:24px'>1. 인공지능 신경망 펼치기/접기</summary>
+
 ## [１. 머신러닝과 딥러닝](#1-머신-러닝과-딥러닝)
 <details open>
   <summary style='background-color: #3498db;
@@ -107,7 +109,26 @@
   
   * [5-3-2 미세 조정 기법 (09.11)](#5-3-2미세-조정-기법-0911)
 
-  * [5](#5-3-3)
+  * [5-3-3 그래프 합성곱 네트워크 신경망 (09.12)](#5-3-3그래프-합성곱-네트워크-0912)
+
+[6. 합성곱 신경망](#6-합성곱-신경망)
+
+  * [6-1. 이미지 분류를 위한 신경망 (09.12)](#6-1-이미지-분류를-위한-신경망-0912)
+
+    * [#6-1-1. LeNet-5](#6-1-1-lenet-5-0912)
+    
+    * [#6-1-2. AlexNet](#6-1-2-alexnet-0912)
+    
+    * [#6-1-3. VggNet](#6-1-3-vggnet-0912)
+    
+    * [#6-1-4. GoogLeNet](#6-1-4-googlenet-0912)
+    
+    * [#6-1-5. ResNet](#6-1-5-resnet-0912)
+
+  * [6-2. 객체 인식을 위한 신경망 (09.12)](#6-2-객체-인식을-위한-신경망-0912)
+
+  * [6-3. 이미지 분할을 위한 신경망 (09.12)](#6-3-이미지-분헐을-위한-신경망-0912)
+
 </details>
 
 ## #1. 머신 러닝과 딥러닝
@@ -911,7 +932,7 @@ ___
 
 
 ## #6. 합성곱 신경망
-### #6-1 이미지 분류를 위한 신경망
+### #6-1 이미지 분류를 위한 신경망 (09.12)
 이미지 분류를 위해서 보통 Conv 레이어와 maxPool 층, FC층 등을 사용하는데, 이 때, 각 레이어마다 사용할 입/출력 노드 수가 고민될 수 있다. 그때, 각 파라미터와 배치 순서, 횟수 등을 일종의 템플릿처럼 사용하는 방식이 있다.
 
 ___
@@ -1036,7 +1057,107 @@ $$객체 인식=여러 가지 객체에 대한 분류 + 객체의 위치 정보�
 
 
 * 완전 합성곱 네트워크
-* 합송곱 & 역합성곱 네트워크
+* 합성곱 & 역합성곱 네트워크
 * U-Net
 * PSPNet
 * DeepLabv3/DeepLabv3+
+
+</details>
+
+<hr>
+<hr>
+
+<details>
+  <summary style='cursor:pointer;font-size:24px'>2. 파이썬 Flask</summary>
+
+
+
+
+## #1. Flask 기초
+### #1-1. Flask 특징 (09.13)
+Flask 는 파이썬 기반으로 만든 웹 프레임워크로 적당히 가볍고 적당히 다양한 기능을 제공해 많이 쓰인다.
+
+Flask 는 호스트 아이피, 포트 등을 설정할 수 있다.
+
+디자인 패턴으로 MVT 패턴을 채용하고 있다
+
+단순히 Html 을 외부에 보여 주는 기능이 아닌, GET, POST, PUT, DELETE 등의 메소드를 지원해 RestFul API 서버를 만드는데에도 쓸 수 있다.
+
+___
+### #1-2. Flask 기본 문법
+
+> 엔드포인트 추가
+``` python
+@app.route("/smaplePage")
+def samplePage():
+  return '<h1> Hello Flask! </h1>'
+```
+> 메소드 추가
+``` python
+@app.route("/samplePage", methods=["GET", "POST"]):
+def samplePage():
+    pass
+```
+> 경로 변수 획득
+``` python
+@app.route("/samplePage/<var1>")
+def samplePage(var1):
+    pass
+```
+> html 문서 표시 및 변수 전달
+``` python
+@app.route("/showHtml/<var1>"):
+def showHtml(var1):
+  return render_template("target.html", var1=var1)
+```
+> html 문서에서 전달받은 변수 사용
+``` html
+<h1> var1: {{var1}}</h1>
+```
+
+___
+### #1-3 Flask 고유 개념
+* **애플리케이션 컨텍스트**<br>
+앱 레벨의 데이터를 사용할 수 있도록 하는 컨텍스트. 애플리케이션 레벨의 데이터는 다음과 같은 종류가 있다
+    * 실행중인 앱의 인스턴스인 **current_app**
+    * 요청을 통해 이용할수 있는 일시 영역(매 요청 마다 초기화됨)을 사용하는 **g**
+
+의 컨텍스트가 있다.<br>
+만일 컨텍스트를 사용하지 않고, 앱에 직접 접근할 경우에는 앱의 규모가 커지면 순환 참조가 발생하기 쉬운데, 이를 해결하기 위해 요청을 하면 스택에 push 하며 각 컨텍스트에서 사용할 수 있게 된다.
+* **요청 컨텍스트**<br>
+요청이 있는 동안 요청 레벨의 데이터를 이용할 수 있도록 한 것
+* **Flash 메시지**<br>
+동작 후에 간단한 메시지를 표시하는 기능으로 다음과 같이 사용한다<br>
+주의점으로 세션에 메시지를 남기는 것임으로 세션을 만들기 위해 config 의 SECRET_KEY 를 설정해야 한다
+```python
+# 파이썬
+flash('test message')
+```
+``` html
+<!--html -->
+<h1> Test Flash is {{get_flashed_messages()}}</h1>
+```
+* **로깅**<br>
+```python
+app.logger.serLevel(logging.DEBUG)
+app.logger.critical('fatal error')
+app.logger.error('error')
+app.logger.warning('warning')
+app.logger.info('info')
+app.logger.debug('debug')
+```
+* **쿠키/세션**<br>
+``` python
+# 값 획득
+cookie_value = request.cookies.get('key')
+session_value = session['key']
+
+# 값 설정
+response.set_cookie('key', 'value')
+session['key'] = 'value'
+
+# 값 삭제
+response.delete_cookie('key')
+session.pop('key', None)
+```
+</details>
