@@ -1084,7 +1084,7 @@ Flask 는 호스트 아이피, 포트 등을 설정할 수 있다.
 단순히 Html 을 외부에 보여 주는 기능이 아닌, GET, POST, PUT, DELETE 등의 메소드를 지원해 RestFul API 서버를 만드는데에도 쓸 수 있다.
 
 ___
-### #1-2. Flask 기본 문법
+### #1-2. Flask 기본 문법 (09.13)
 
 > 엔드포인트 추가
 ``` python
@@ -1116,7 +1116,7 @@ def showHtml(var1):
 ```
 
 ___
-### #1-3 Flask 고유 개념
+### #1-3 Flask 고유 개념 (09.13)
 * **애플리케이션 컨텍스트**<br>
 앱 레벨의 데이터를 사용할 수 있도록 하는 컨텍스트. 애플리케이션 레벨의 데이터는 다음과 같은 종류가 있다
     * 실행중인 앱의 인스턴스인 **current_app**
@@ -1160,4 +1160,120 @@ session['key'] = 'value'
 response.delete_cookie('key')
 session.pop('key', None)
 ```
+
+## #2. 데이터베이스 연동
+### #2-1. 블루프린트 (09.13)
+블루프린트는 앱을 분할하기 위한 flask 의 기능이다. 앱의 규모가 커져도 간결한 상태가 유지되어 유지보수가 수월해진다.
+``` python
+# App.py
+from sampleFolder import view
+app.register_blueprint(sampleFolder.blueprintApp, url_prefix="/sampleBlueprint")
+
+# sampleFolder.view.py
+blueprintApp = Blueprint(
+    "blueprintApp",
+    __name__,
+    template_folder="template",
+    static_folder="static",
+)
+@blueprintApp.route('/')
+def home():
+    return '<h1> samplebluePrint App</h1>'
+```
+만일 위의 코드를 실행한다면, localhost:5000/sampleBlueprint 도메인 아래에 blueprintApp 이 표시된다
+
+___
+### #2-2. SQLAlchemy 를 이용한 SQL 조작 (09.13)
+``` python
+# SQLAlchemy 선언
+db = SQLAlchemy()
+
+# 모델 및 모델을 넣을 테이블 정의
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, index=True)
+    email = db.Column(db.String, unique=True, index=True)
+    password_hash = db.Column(db.String)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    update_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    @property
+    def password(self):
+        raise AttributeError("읽어 들일 수 없음")
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+# 테이블에 새로운 row 추가 (Create)
+user = User(
+  username='normaly nickname',
+  email='testingmail@gmail.com',
+  password='1q2w3e4r', # 모델에 해시함수가 있어 자동으로 해싱된 값이 테이블에 들어감
+)
+db.session.add(user)
+db.session.commit()
+
+# 테이블의 모든 데이터 가져오기 (Read)
+users = User.query.all()
+
+# 테이블의 개별 row 에 대해 수정 (Update)
+user = get_spesific_user() # 임의의 유저를 가져오는 함수 (read)
+user.username = 'updated user name'
+user.email = 'updateMail@gmail.com'
+user.password = 'updated password' # Create 와 동일한 이유로 해싱됨
+db.session.add(user)
+db.session.commit()
+
+# 테이블의 개별 row 삭제 (Delete)
+user = get_spesific_user() # 임의의 유저를 가져오는 함수
+db.session.delete(user)
+db.session.commit()
+```
+위와 같은 Create, Read, Update, Delete 동작을 데이터베이스 조작에 필요한 최소조건으로 말하며 일명 CRUD 라고 한다.
+
+
+___
+### #2-3. 템플릿을 이용한 html 문서 공통화 (09.13)
+Html 파일들을 이용해 다양한 페이지를 작성하다 보면, navBar 나 Home button 등, 공통적으로 사용되는 디자인이나 css, js 등이 있는데 이를 매 페이지마다 새로 작성하면 다음과 같은 문제가 발생할 수 있다.
+* 각 페이지마다 모든 디자인을 따로 저장하기 때문에 페이지마다 다른 내용이 들어갈 수 있다.
+* 만일 공통적으로 사용되는 디자인이 바뀐다면 모든 페이지에 대해 작업을 다시 해야 한다.
+
+이를 해결하기 위해 Flask 와 함께 사용하는 Jinja 템플릿에서는 **하나의 html 파일을 만들고, 이를 다른 html 에서도 재사용 및 수정** 을 가능하게 해 준다.
+> base.html
+``` html
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+</head>
+<body>
+	<h1> Base html file</h1>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
+```
+
+> child1.html
+``` html
+{% extends 'base.html' %}
+{% block title %}
+child 1
+{% endblock %}
+{% block content}
+<h1> child1 htmle file</h1>
+{% endblock %}
+```
+이와 같이 작성하게 되면 child1.html 은 base 에서 표시하는 글자인 `<h1> Base html file</h1>` 과 child 에서 표시하는 `<h1> child1 htmle file</h1>` 이 표시될 것이다
 </details>
+
+
+___
+### #2-4. config 공통화

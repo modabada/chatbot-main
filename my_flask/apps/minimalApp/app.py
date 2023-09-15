@@ -1,15 +1,11 @@
-import logging
 import os
 from flask_mail import Mail, Message
 from flask_debugtoolbar import DebugToolbarExtension
 from email_validator import EmailNotValidError, validate_email
 from flask import (
     Flask,
-    current_app,
     flash,
-    g,
     session,
-    logging,
     redirect,
     make_response,
     render_template,
