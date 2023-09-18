@@ -5,7 +5,7 @@ basedir = Path(__file__).parent.parent
 
 
 class BaseConfig:
-    SECREY_KEY = "TestingSecretKey"
+    SECRET_KEY = "TestingSecretKey"
     WTF_CSRF_SECRET_KEY = "TestingCSRFSecretKey"
 
 

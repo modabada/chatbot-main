@@ -1162,7 +1162,7 @@ session.pop('key', None)
 ```
 
 ## 2. 데이터베이스 연동
-### 2-1. 블루프린트 (09.13)
+### 2-1. 블루프린트 (09.14)
 블루프린트는 앱을 분할하기 위한 flask 의 기능이다. 앱의 규모가 커져도 간결한 상태가 유지되어 유지보수가 수월해진다.
 ``` python
 # App.py
@@ -1236,7 +1236,7 @@ db.session.commit()
 
 
 ___
-### 2-3. 템플릿을 이용한 html 문서 공통화 (09.13)
+### 2-3. 템플릿을 이용한 html 문서 공통화 (09.14)
 Html 파일들을 이용해 다양한 페이지를 작성하다 보면, navBar 나 Home button 등, 공통적으로 사용되는 디자인이나 css, js 등이 있는데 이를 매 페이지마다 새로 작성하면 다음과 같은 문제가 발생할 수 있다.
 * 각 페이지마다 모든 디자인을 따로 저장하기 때문에 페이지마다 다른 내용이 들어갈 수 있다.
 * 만일 공통적으로 사용되는 디자인이 바뀐다면 모든 페이지에 대해 작업을 다시 해야 한다.
@@ -1276,4 +1276,126 @@ child 1
 
 
 ___
-### 2-4. config 공통화
+### 2-4. config 공통화 (09.14)
+``` python
+# apps/config.py
+basedir = Path(__file__).parent.parent
+class Config1:
+  var1 = "val1"
+  var2 = "val2"
+class Config2(Config1):
+  var2 = "val2"
+  var3 = "val3"
+  var4 = "val4"
+config = {
+  "con1": Config1,
+  "con2": Config2,
+}
+
+# apps/app.py
+def create_app(config_key):
+  app = Flask(__name__)
+  app.config.from_object(config[config_key])
+  # 이후 생략
+```
+위와 같이 설정 키를 받아 이를 앱에 적용시킬 수 있으며
+```
+# "projectDir/.env
+FLASK_APP = apps.app:create_app("con1")
+```
+와 같이 사용하여 `flask run` 실행 시 con1 이라는 키를 넘겨 줄 수 있다.
+
+## 3. 로그인 기능 생성
+이 단원에서는 모두 `flask-login` 이라는 패키지를 이용하여 진행된다
+### 3-1. flask login 기본 설정 (09.18)
+기본적으로 flask-login 이 설치되어있다는 가정 하에 진행한다
+```python 
+# apps/app.py
+from flask_login import LoginManager
+login_manager = LoginManager()
+# 미 로그인시 리다이렉트할 엔드포인트
+login_manager.login_view = "auth.signup"
+# 로그인 후 표시할 메세지
+login_manager.login_message = ""
+# 앱 등록
+login_manager.init_app(app)
+
+# apps/crud/models.py
+from apps.app import db, login_manager
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+class User(db.Model, UserMixin):
+  # ...생략...
+  def verify_password(self, password):
+    return check_password_hash(self.password_hash, password)
+
+  def is_duplacate_email(self):
+    return User.query.filter_by(email=self.email).first() is not None
+
+  @login_manager.user_loader
+  def load_user(user_id):
+    return User.query.get(user_id)
+
+# 이후로는 apps/crud/views.py 의 모든 엔드포인트에 대해 login_required 데코레이터를 붙여 설정을 완료한다
+```
+여기에서 crud 의 model 을 다시 정의 할 때 사용된 `UserMixin` 은 로그인 기능 관련에 필요한 프로퍼티/메서드 를 가지고 있다
+| 프로퍼티/메서드 | 이름 | 설명 |
+| - | - | - |
+| method | is_authenticated | 로그인 여부에 대해 boolean 반환 |
+| method | is_active | 사용자 계정이 활성 상태인지에 대한 boolean 반환 |
+| method | is_anonymous | 로그인 사용자는 false 를 반환, 익명 사용자는 true 를 반환 |
+| property | get_id | 로그인 사용자의 유니크 ID |
+
+___
+### #3-2. 로그인 관련 기능 구현 (09.18)
+``` python
+# 회원가입
+if user.is_duplicate_email():
+  return # 이미 가입된 계정 처리
+db.session.add(user)
+db.session.commit()
+login_user()
+next = request.args.get('next') # 쿼리 파라미터에 next 를 가져옴
+if next is None or not next.startsWith('/'):
+  next = '' # 회원가입 후 이동할 기본 페이지
+return redirect(next)
+
+# 로그인
+user = User.quer.filter_by(email=form.email.data).first()
+if user is not None and user.verify_password(password):
+  login_user(user)
+  return redirect(page) # 로그인 후 이동할 페이지
+else:
+  # 로그인 실패 처리
+
+# 로그아웃
+from flask_login import logout_user
+logout_user()
+return redirect(page) # 로그아웃 후 이동할 페이지
+```
+각 python 코드들을 적당한 html 템플릿과 함께 사용하여 구현한다
+
+## 4. 물체 감지 앱 만들기
+### 4-1. 데이터 조작 (09.18)
+### 4-1-1. DB 테이블 조작 (09.18)
+``` python
+# inner join
+db.session.query(Model1, Model2).join(Modl2).filter(Model1.id == Model2.id).all()
+# F key 가 설정되어 있다면 filter 생략 가능
+db.session.query(Model1, Model2).join(Model2).all()
+
+# outter join
+db.session.query(Model1, Model2).outerjoin(Model2).filter(Model1.id == Model2.id).all()
+```
+### 4-1-2. 릴레이션 (09.18)
+릴레이션을 통해 모델에서 관련한 테이블의 객체를 추출할 수 있으며 다음과 같이 사용한다
+`model1 = relationship("Model1")`
+> 릴레이션의 주요 옵션
+
+| 옵션 명 | 설명 |
+| - | - |
+| backref | 다른 모델에 대해서 양방향으로 릴레이션 한다 |
+| lazy | 관련한 모델을 지연하여 취득하는 옵션, 기본값은  select 며 immediate, joined, subquery, noload, dynamic 등의 옵션이 있다 |
+| order_by | 정렬할 컬럼을 지정한다 |
+
+이때 backref는 모델 객체에서 다른 모델 객체를 얻어 올 떄 사용된다.
