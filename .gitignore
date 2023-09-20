@@ -12,6 +12,8 @@ pytorch/data/**
 !pytorch/data/**/*.csv
 !pytorch/data/**/*.data
 
+pytorch/.data/**
+
 
 my_flask/apps/detector/model.pt
 

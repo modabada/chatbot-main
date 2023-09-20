@@ -1,33 +1,16 @@
-import copy
 import cv2
-import glob
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
 from PIL import Image
 import random
-import seaborn as sns
-from sklearn import metrics
-from sklearn.cluster import DBSCAN
-from sklearn.datasets import load_digits
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import normalize
-from sklearn.decomposition import PCA
-import shutil
 import time
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torchsummary import summary
-import torchvision
 from torchvision import transforms
-import torchvision.models as models
-from torchvision.transforms import ToTensor
 import tqdm.notebook as tqdm
 
 # 'a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z'
@@ -222,23 +205,23 @@ criterion = criterion.to(device)
 
 
 # 모델 학습 함수
-def train_model(model, dataloader_dict, criterion, optimizer, num_epoch):    
+def train_model(model, dataloader_dict, criterion, optimizer, num_epoch):
     since = time.time()
     best_acc = 0.0
-    
+
     for epoch in range(num_epoch):
-        print('Epoch {}/{}'.format(epoch + 1, num_epoch))
-        print('-' * 20)
-        
-        for phase in ['train', 'validate']:            
-            if phase == 'train':
+        print("Epoch {}/{}".format(epoch + 1, num_epoch))
+        print("-" * 20)
+
+        for phase in ["train", "validate"]:
+            if phase == "train":
                 model.train()
             else:
                 model.eval()
-            
+
             epoch_loss = 0.0
             epoch_corrects = 0
-            
+
             for img, lab in tqdm.tqdm_notebook(dataloader_dict[phase]):
                 img = img.to(device)
                 # tqdm 라이브러리가 멍청이가 되버려서 수동으로 str to int 변환
@@ -246,26 +229,30 @@ def train_model(model, dataloader_dict, criterion, optimizer, num_epoch):
                 lab = torch.tensor([classes[e] for e in lab])
 
                 optimizer.zero_grad()
-                
-                with torch.set_grad_enabled(phase == 'train'):
+
+                with torch.set_grad_enabled(phase == "train"):
                     outputs = model(img)
                     _, preds = torch.max(outputs, 1)
                     loss = criterion(outputs, lab)
-                    
-                    if phase == 'train':
+
+                    if phase == "train":
                         loss.backward()
                         optimizer.step()
-                    
+
                     epoch_loss += loss.item() * img.size(0)
                     epoch_corrects += torch.sum(preds == lab.data)
-            
+
             epoch_loss = epoch_loss / len(dataloader_dict[phase].dataset)
             epoch_acc = epoch_corrects.double() / len(dataloader_dict[phase].dataset)
-            
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+
+            print("{} Loss: {:.4f} Acc: {:.4f}".format(phase, epoch_loss, epoch_acc))
 
     time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print(
+        "Training complete in {:.0f}m {:.0f}s".format(
+            time_elapsed // 60, time_elapsed % 60
+        )
+    )
     return model
 
 
@@ -290,7 +277,7 @@ with torch.no_grad():
         model.eval()
         outputs = model(img)
         preds = F.softmax(outputs, dim=1)[:, 1].tolist()
-        
+
         id_list.append(_id)
         pred_list.append(preds[0])
 
