@@ -1,7 +1,7 @@
 <details>
   <summary style='cursor:pointer;font-size:24px'>1. 인공지능 신경망 펼치기/접기</summary>
 
-## [１. 머신러닝과 딥러닝](#1-%EB%A8%B8%EC%8B%A0-%EB%9F%AC%EB%8B%9D%EA%B3%BC-%EB%94%A5%EB%9F%AC%EB%8B%9D)
+## [１. 머신러닝과 딥러닝](#1-머신-러닝과-딥러닝)
 <details open>
   <summary style='background-color: #3498db;
     color: #fff;
@@ -12,7 +12,7 @@
     펼치기/접기
   </summary>
 
-  [1-1. 머신 러닝과 딥러닝의 차이](#1-1-머신-러닝과-딥러닝의-차이)
+  [1-1. 머신 러닝과 딥러닝의 차이](#11-머신-러닝과-딥러닝의-차이)
 </details>
 
 ## [２. 파이토치 기초](#2-파이토치-기초)
@@ -25,7 +25,7 @@
     outline: none;'>
     펼치기/접기
   </summary>
-
+ 2-1. 파이토치 특징 (09.04)
 
 [2-1. 파이토치 특징 (09.04)](#2-1-파이토치-특징-0904)
 
@@ -1347,7 +1347,7 @@ class User(db.Model, UserMixin):
 | property | get_id | 로그인 사용자의 유니크 ID |
 
 ___
-### #3-2. 로그인 관련 기능 구현 (09.18)
+### 3-2. 로그인 관련 기능 구현 (09.18)
 ``` python
 # 회원가입
 if user.is_duplicate_email():

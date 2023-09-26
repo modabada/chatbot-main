@@ -13,6 +13,9 @@ pytorch/data/**
 !pytorch/data/**/*.data
 
 
+my_flask/apps/detector/model.pt
+
+
 # C extensions
 *.so
 

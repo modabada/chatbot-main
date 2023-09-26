@@ -12,13 +12,6 @@ crud = Blueprint(
 )
 
 
-@crud.route("/")
-# 로그인 필수 데코레이터
-@login_required
-def index():
-    return render_template("crud/index.html")
-
-
 @crud.route("/sql")
 @login_required
 def sql():
