@@ -7,13 +7,8 @@ __pycache__/
 .vscode/
 
 pytorch/data/**
-!pytorch/data/**/*.png
-!pytorch/data/**/*.jpg
-!pytorch/data/**/*.csv
-!pytorch/data/**/*.data
-
 pytorch/.data/**
-
+pytorch/data2/**
 
 my_flask/apps/detector/model.pt
 

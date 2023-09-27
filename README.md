@@ -1,3 +1,7 @@
+pytorch 에서 필요한 파일들은
+[링크](https://drive.google.com/drive/folders/1FuN608o97RZARdj0MkIhWlFU8Gkb9J4l?usp=sharing)에서 다운받아 사용하세요
+
+
 <details>
   <summary style='cursor:pointer;font-size:24px'>1. 인공지능 신경망 펼치기/접기</summary>
 
