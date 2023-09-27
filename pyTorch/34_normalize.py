@@ -85,3 +85,69 @@ class BinaryClassification(nn.Module):
 
 
 # 손실함수와 옵티마이저 지정
+epochs = 1000 + 1
+print_epoch = 100
+LEARNING_RATE = 1e-2
+
+model = BinaryClassification()
+model.to(device)
+print(model)
+# BCE 손실함수와 시그모이드 함수가 결합된 손실함수
+BCE = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+
+
+# 성능측정
+def accuracy(y_pred, y_test):
+    y_pred_tag = torch.round(torch.sigmoid(y_pred))
+    correct_results_sum = (y_pred_tag == y_test).sum().float()
+    acc = correct_results_sum / y_test.shape[0]
+    acc = torch.round(acc * 100)
+    return acc
+
+
+# 학습 진행
+for epoch in range(epochs):
+    iter_loss = 0
+    iter_acc = 0
+
+    model.train()
+    for i, data in enumerate(train_loader):
+        data.to(device)
+        x, y = data
+        y_pred = model(x.float())
+        loss = BCE(y_pred, y.reshape(-1, 1).float())
+
+        iter_loss += loss
+        iter_acc += accuracy(y_pred, y)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    if epoch % print_epoch == 0:
+        print(
+            "Train: epoch: {0} - loss: {1:.5f}; acc: {2:.3f}".format(
+                epoch,
+                iter_loss / (i + 1),
+                iter_acc / (i + 1),
+            )
+        )
+
+    # 검증단계
+    iter_loss = 0
+    iter_acc = 0
+    model.eval()
+    for i, data in enumerate(test_loader):
+        data.to(device)
+        x, y = data
+        y_pred = model(x.float())
+        loss = BCE(y_pred, y.reshape(-1, 1).float())
+        iter_loss += loss
+        iter_acc += accuracy(y_pred, y)
+    if epoch % print_epoch == 0:
+        print(
+            "Test: epoch: {0} - loss: {1:.5f}; acc: {2:.3f}".format(
+                epoch,
+                iter_loss / (i + 1),
+                iter_acc / (i + 1),
+            )
+        )
